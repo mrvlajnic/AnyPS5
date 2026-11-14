@@ -322,6 +322,7 @@ int APS5_VABI sceVoiceGetPortInfo(uint32_t port_id, VoicePortInfo* info) {
         if (!WriteGuest(info, localInfo)) return InvalidArgument;
         return NeverStarted;
     }
+    if (!ReadGuest(info, localInfo)) return InvalidArgument;
     localInfo.port_type = port.type;
     localInfo.state = PortStateReady;
     localInfo.byte_count = 0;
