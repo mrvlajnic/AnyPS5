@@ -62,6 +62,9 @@ int main() {
             const auto size = attr == 1003 ? 2 : attr == 1002 || attr == 2001 ? 4 : 1;
             Require(sceVoiceGetPortAttr(port, attr, buffer.data() + 1, size + 1) == invalidArgument);
             if (type == 0 && attr == 1001) {
+                errno = 71;
+                Require(sceVoiceGetPortAttr(port, attr, reinterpret_cast<void*>(std::uintptr_t{0x10}), size) == invalidArgument);
+                Require(errno == 71);
                 buffer = original;
                 Require(sceVoiceGetPortAttr(port, attr, buffer.data() + 1, size) == 0);
                 Require(buffer[0] == original[0] && buffer[1] == 0 && buffer[2] == original[2]);

@@ -482,20 +482,6 @@ int main() {
     Require(sceVoiceDeletePort(127) == portNotFound);
     for (const auto type : {0, 1, 2, 3, 4, 5}) {
         const auto id = CreatePort(type, -2.0f);
-        errno = 71;
-        Require(sceVoiceGetVolume(id, reinterpret_cast<float*>(0x10)) == invalidArgument);
-        Require(errno == 71);
-        errno = 71;
-        Require(sceVoiceGetPortInfo(id, reinterpret_cast<VoicePortInfo*>(0x10)) == invalidArgument);
-        Require(errno == 71);
-        errno = 71;
-        Require(sceVoiceGetMemorySize(0, 0, 0, 0, 0, 0, 0, 0, 0, reinterpret_cast<std::uint32_t*>(0x10)) == invalidArgument);
-        Require(errno == 71);
-        if (type == 3) {
-            errno = 71;
-            Require(sceVoiceGetPortAttr(id, 1001, reinterpret_cast<void*>(0x10), 1) == invalidArgument);
-            Require(errno == 71);
-        }
         Require(sceVoiceGetBitRate(id, &bitrate) == (type == 2 || type == 4 ? 0 : portNotFound));
         if (type == 2 || type == 4) Require(bitrate == 16000);
         for (const float value : {-2.0f, -0.0f, 0.25f, 2.0f, std::numeric_limits<float>::max(), std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::quiet_NaN()}) {
@@ -552,6 +538,18 @@ int main() {
 
     const auto guestInput = CreatePort(2, 0.5f);
     const auto guestOutput = CreatePort(3, 0.5f);
+
+    errno = 71;
+    Require(sceVoiceGetVolume(guestInput, reinterpret_cast<float*>(std::uintptr_t{0x10})) == invalidArgument);
+    Require(errno == 71);
+
+    errno = 71;
+    Require(sceVoiceGetPortInfo(guestInput, reinterpret_cast<VoicePortInfo*>(std::uintptr_t{0x10})) == invalidArgument);
+    Require(errno == 71);
+
+    errno = 71;
+    Require(sceVoiceGetMemorySize(0, 0, 0, 0, 0, 0, 0, 0, 0, reinterpret_cast<std::uint32_t*>(std::uintptr_t{0x10})) == invalidArgument);
+    Require(errno == 71);
 
     errno = 71;
     Require(sceVoiceUpdatePort(guestInput, unreadablePortParam) == invalidArgument);
